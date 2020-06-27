@@ -178,6 +178,47 @@ const renderApprovalRateDistribution = (data, selector) => {
         }
     });
 };
+const renderRatesDistributionPerDate = (data, selector) => {
+    let chartData = {};
+
+    for (let entry of data) {
+        if (typeof chartData[entry.date] === 'undefined') {
+            chartData[entry.date] = {
+                count: 0,
+                rateSum: 0
+            };
+        }
+
+        chartData[entry.date].count++;
+        chartData[entry.date].rateSum += entry.grade;
+    }
+
+    let keys = ['Rate'];
+    let columns = [['Rate']];
+    let xAxisLabels = [];
+    let dates = Object.keys(chartData).sort((a, b) => (new Date(a)).getTime() - (new Date(b)).getTime());
+
+    for (let date of dates) {
+        const avgRate = Math.round(chartData[date].rateSum / chartData[date].count * 100) / 100;
+        xAxisLabels.push(date);
+        columns[0].push(avgRate);
+    }
+
+    c3.generate({
+        bindto: selector,
+        data: {
+            x: 'x',
+            columns: [['x', ...xAxisLabels], ...columns],
+            type: 'bar',
+            colors: transformKeysToColorPalette(keys)
+        },
+        axis: {
+            x: {
+                type: 'category'
+            }
+        }
+    });
+};
 const renderStatisticsByKeywords = (data, words, selector) => {
     let chartData = {};
 
@@ -232,5 +273,6 @@ window.onload = async () => {
     renderRatesDistributionByEdgeValues(data.filter(entry => entry.date === 'Jun 19, 2020'), '#chart4');
     renderProportionOfNewRates(data, '#chart5')
     renderApprovalRateDistribution(data.filter(entry => entry.approvalRate), '#chart6');
-    renderStatisticsByKeywords(data, ['garbage', 'Druckmann', 'SJW', 'gay', 'lesbian', 'gameplay', 'masterpiece'], '#chart7');
+    renderRatesDistributionPerDate(data, '#chart7')
+    renderStatisticsByKeywords(data, ['garbage', 'Druckmann', 'SJW', 'gay', 'lesbian', 'gameplay', 'masterpiece'], '#chart8');
 };
