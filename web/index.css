@@ -14,4 +14,15 @@ h1 {
 
 h2 {
     font-size: 18px;
+    font-weight: 400;
+}
+
+.stat-container {
+    font-size: 18px;
+    text-align: center;
+}
+
+.stat-container span {
+    font-weight: 700;
+    font-family: 'Open Sans', sans-serif;
 }
