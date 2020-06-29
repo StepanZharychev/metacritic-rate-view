@@ -69,9 +69,9 @@ const renderRatesDistributionByEdgeValues = (data, selector) => {
         if (entry.grade <= 1) {
             chartData['Low (0-1)']++;
         } else if (entry.grade >= 9) {
-            chartData['Medium (2-8)']++;
-        } else {
             chartData['High (9-10)']++;
+        } else {
+            chartData['Medium (2-8)']++;
         }
         totalNumberOfEntries++;
     }
@@ -96,7 +96,7 @@ const renderRatesDistributionByEdgeValues = (data, selector) => {
         }
     });
 };
-const renderProportionOfNewRates = (data, selector) => {
+const renderProportionOfNewRates = (data, selector, releaseDate) => {
     let stats = {
         singleAccounts: {
             count: 0,
@@ -119,7 +119,7 @@ const renderProportionOfNewRates = (data, selector) => {
         } else {
             const oldestRating = getOldestReview(entry);
 
-            if ((new Date(oldestRating.date)).getTime() < (new Date('Jun 19, 2020')).getTime()) {
+            if ((new Date(oldestRating.date)).getTime() < (new Date(releaseDate)).getTime()) {
                 stats.oldAccounts.count++;
                 stats.oldAccounts.rateSum += entry.grade;
             } else {
@@ -178,7 +178,7 @@ const renderApprovalRateDistribution = (data, selector) => {
         }
     });
 };
-const renderRatesDistributionPerDate = (data, selector) => {
+const renderRatesDistributionPerDate = (data, selector, dayLimit) => {
     let chartData = {};
 
     for (let entry of data) {
@@ -199,9 +199,11 @@ const renderRatesDistributionPerDate = (data, selector) => {
     let dates = Object.keys(chartData).sort((a, b) => (new Date(a)).getTime() - (new Date(b)).getTime());
 
     for (let date of dates) {
-        const avgRate = Math.round(chartData[date].rateSum / chartData[date].count * 100) / 100;
-        xAxisLabels.push(date);
-        columns[0].push(avgRate);
+        if (!dayLimit || xAxisLabels.length <= dayLimit) {
+            const avgRate = Math.round(chartData[date].rateSum / chartData[date].count * 100) / 100;
+            xAxisLabels.push(date);
+            columns[0].push(avgRate);
+        }
     }
 
     c3.generate({
@@ -271,7 +273,7 @@ window.onload = async () => {
     renderRatesDistributionChart(data.filter(entry => entry.date === 'Jun 19, 2020'), '#chart2');
     renderRatesDistributionByEdgeValues(data, '#chart3');
     renderRatesDistributionByEdgeValues(data.filter(entry => entry.date === 'Jun 19, 2020'), '#chart4');
-    renderProportionOfNewRates(data, '#chart5')
+    renderProportionOfNewRates(data, '#chart5', 'Jun 19, 2020')
     renderApprovalRateDistribution(data.filter(entry => entry.approvalRate), '#chart6');
     renderRatesDistributionPerDate(data, '#chart7')
     renderStatisticsByKeywords(data, ['garbage', 'Druckmann', 'SJW', 'gay', 'lesbian', 'gameplay', 'masterpiece'], '#chart8');
